@@ -1,36 +1,30 @@
 import { combineReducers } from 'redux';
-import { ADD, DELETE, FILTER } from './contacts-types';
+import { createReducer } from '@reduxjs/toolkit';
+import * as actions from './contacts-action';
 
-const localContacts = JSON.parse(window.localStorage.getItem('contacts'));
+const itemsInitialState = [
+  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+];
 
-const contactsReducer = (state = localContacts ? localContacts : [], { type, payload }) => {
-  let newState = [];
-  switch (type) {
-    case ADD:
-      newState = [...state, payload];
-      window.localStorage.setItem('contacts', JSON.stringify(newState));
-      return newState;
-    case DELETE:
-      newState = state.filter(contact => contact.id !== payload);
-      window.localStorage.setItem('contacts', JSON.stringify(newState));
-      return newState;
-
-    default:
+const items = createReducer(itemsInitialState, {
+  [actions.newContact]: (state, { payload }) => {
+    if (state.some(contact => contact.name.toLowerCase() === payload.name)) {
+      alert(`${payload.name} is already in contacts`);
       return state;
-  }
-};
+    }
+    return [payload, ...state];
+  },
+  [actions.deleteContact]: (state, { payload }) => state.filter(({ id }) => id !== payload),
+});
 
-const filterReducer = (state = '', { type, payload }) => {
-  switch (type) {
-    case FILTER:
-      return payload;
-
-    default:
-      return state;
-  }
-};
+const filter = createReducer('', {
+  [actions.changeFilter]: (_, { payload }) => payload,
+});
 
 export default combineReducers({
-  items: contactsReducer,
-  filter: filterReducer,
+  items,
+  filter,
 });

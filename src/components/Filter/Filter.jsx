@@ -1,9 +1,15 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { getFilter } from '../redux/contacts/contacts-selector';
 import { changeFilter } from '../redux/contacts/contacts-action';
 import s from 'components/Filter/Filter.module.css';
 
-const Filter = ({ value, onChange }) => {
+const Filter = () => {
+  const value = useSelector(getFilter);
+  const dispatch = useDispatch();
+
+  const onChange = e => dispatch(changeFilter(e.target.value));
+
   return (
     <>
       <h3 className={s.titleFilter}>Find contacts by name</h3>
@@ -12,12 +18,4 @@ const Filter = ({ value, onChange }) => {
   );
 };
 
-const mapStateToProps = state => ({
-  value: state.contacts.filter,
-});
-
-const mapDispatchToProps = dispatch => ({
-  onChange: e => dispatch(changeFilter(e.target.value)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Filter);
+export default Filter;
